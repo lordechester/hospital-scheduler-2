@@ -4,7 +4,8 @@ import { DaySelector } from './components/DaySelector';
 import { Week } from './components/Week';
 import { BookingModal } from './components/BookingModal';
 import { MonthSchedule, TimeSlot, BookingDetails, DayOfWeek } from './types/schedule';
-import { createInitialSchedule, updateTimeSlotBooking, findTimeSlotById } from './utils/scheduleUtils';
+import { createInitialSchedule, findTimeSlotById } from './utils/scheduleUtils';
+import { saveBooking } from './utils/bookingStorage';
 import { createDemoSchedule } from './utils/demoData';
 
 function App() {
@@ -14,11 +15,22 @@ function App() {
   const [schedule, setSchedule] = useState<MonthSchedule | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<TimeSlot | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Initialize demo data on first load
+  useEffect(() => {
+    if (!isInitialized) {
+      createDemoSchedule(currentYear, currentMonth, selectedDay);
+      setIsInitialized(true);
+    }
+  }, [isInitialized, currentYear, currentMonth, selectedDay]);
 
   // Initialize schedule when year, month, or selected day changes
   useEffect(() => {
-    setSchedule(createDemoSchedule(currentYear, currentMonth, selectedDay));
-  }, [currentYear, currentMonth, selectedDay]);
+    if (isInitialized) {
+      setSchedule(createInitialSchedule(currentYear, currentMonth, selectedDay));
+    }
+  }, [currentYear, currentMonth, selectedDay, isInitialized]);
 
   const handleMonthChange = (month: number) => {
     setCurrentMonth(month);
@@ -44,8 +56,23 @@ function App() {
 
   const handleSaveBooking = (booking: BookingDetails) => {
     if (schedule && selectedTimeSlot) {
-      const updatedSchedule = updateTimeSlotBooking(schedule, selectedTimeSlot.id, booking);
-      setSchedule(updatedSchedule);
+      // Extract week number, room number, and time slot type from the time slot ID
+      const match = selectedTimeSlot.id.match(/week-(\d+)-room-(\d+)-(am|pm)/);
+      if (match) {
+        const weekNumber = parseInt(match[1]);
+        const roomNumber = parseInt(match[2]);
+        const timeSlotType = match[3].toUpperCase() as 'AM' | 'PM';
+        
+        // Get the date for this week
+        const week = schedule.weeks.find(w => w.id === `week-${weekNumber}`);
+        if (week && week.date) {
+          // Save the booking to persistent storage
+          saveBooking(week.date, selectedDay, weekNumber, roomNumber, timeSlotType, booking);
+          
+          // Update the schedule to reflect the new booking
+          setSchedule(createInitialSchedule(currentYear, currentMonth, selectedDay));
+        }
+      }
     }
   };
 

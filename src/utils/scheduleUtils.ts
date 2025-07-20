@@ -1,4 +1,5 @@
 import { MonthSchedule, Week, Room, TimeSlot, BookingDetails, DayOfWeek } from '../types/schedule';
+import { getBookingForTimeSlot } from './bookingStorage';
 
 // Function to get the number of weeks in a month based on selected day
 export const getWeeksInMonthForDay = (year: number, month: number, selectedDay: DayOfWeek): number => {
@@ -86,17 +87,20 @@ export const createInitialSchedule = (year: number, month: number, selectedDay: 
   
   for (let weekIndex = 0; weekIndex < numberOfWeeks; weekIndex++) {
     const rooms: Room[] = [];
+    const weekDate = weekDates[weekIndex];
     
     // Create 2 rooms per week
     for (let roomIndex = 0; roomIndex < 2; roomIndex++) {
       const timeSlots: TimeSlot[] = [
         {
           id: `week-${weekIndex + 1}-room-${roomIndex + 1}-am`,
-          type: 'AM'
+          type: 'AM',
+          booking: getBookingForTimeSlot(weekDate, weekIndex + 1, roomIndex + 1, 'AM') || undefined
         },
         {
           id: `week-${weekIndex + 1}-room-${roomIndex + 1}-pm`,
-          type: 'PM'
+          type: 'PM',
+          booking: getBookingForTimeSlot(weekDate, weekIndex + 1, roomIndex + 1, 'PM') || undefined
         }
       ];
       
@@ -110,7 +114,7 @@ export const createInitialSchedule = (year: number, month: number, selectedDay: 
     weeks.push({
       id: `week-${weekIndex + 1}`,
       name: `Week ${weekIndex + 1}`,
-      date: weekDates[weekIndex] || '',
+      date: weekDate || '',
       rooms
     });
   }

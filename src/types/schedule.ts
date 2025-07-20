@@ -35,4 +35,13 @@ export interface MonthSchedule {
 export interface DaySchedule {
   day: string;
   week: Week;
+}
+
+export interface PersistentBooking {
+  date: string; // Format: "YYYY-MM-DD"
+  dayOfWeek: DayOfWeek;
+  weekNumber: number;
+  roomNumber: number;
+  timeSlotType: 'AM' | 'PM';
+  booking: BookingDetails;
 } 

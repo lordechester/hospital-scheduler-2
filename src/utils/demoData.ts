@@ -1,13 +1,22 @@
-import { MonthSchedule, BookingDetails, DayOfWeek } from '../types/schedule';
-import { createInitialSchedule, updateTimeSlotBooking } from './scheduleUtils';
+import { BookingDetails, DayOfWeek } from '../types/schedule';
+import { saveBooking } from './bookingStorage';
 
-export const createDemoSchedule = (year: number, month: number, selectedDay: DayOfWeek): MonthSchedule => {
-  let schedule = createInitialSchedule(year, month, selectedDay);
-  
-  // Add some demo bookings
-  const demoBookings: { timeSlotId: string; booking: BookingDetails }[] = [
+export const createDemoSchedule = (year: number, month: number, selectedDay: DayOfWeek): void => {
+  // Add some demo bookings for different days of the week
+  const demoBookings: {
+    date: string;
+    dayOfWeek: DayOfWeek;
+    weekNumber: number;
+    roomNumber: number;
+    timeSlotType: 'AM' | 'PM';
+    booking: BookingDetails;
+  }[] = [
     {
-      timeSlotId: 'week-1-room-1-am',
+      date: '2024-01-01', // Monday
+      dayOfWeek: 'Monday',
+      weekNumber: 1,
+      roomNumber: 1,
+      timeSlotType: 'AM',
       booking: {
         surgeon: 'Dr. John Doe',
         nurses: ['Nurse Jane', 'Nurse Bob'],
@@ -15,7 +24,11 @@ export const createDemoSchedule = (year: number, month: number, selectedDay: Day
       }
     },
     {
-      timeSlotId: 'week-1-room-2-pm',
+      date: '2024-01-01', // Monday
+      dayOfWeek: 'Monday',
+      weekNumber: 1,
+      roomNumber: 2,
+      timeSlotType: 'PM',
       booking: {
         surgeon: 'Dr. Sarah Johnson',
         nurses: ['Nurse Mike', 'Nurse Lisa', 'Nurse Tom'],
@@ -23,7 +36,11 @@ export const createDemoSchedule = (year: number, month: number, selectedDay: Day
       }
     },
     {
-      timeSlotId: 'week-2-room-1-am',
+      date: '2024-01-08', // Monday
+      dayOfWeek: 'Monday',
+      weekNumber: 2,
+      roomNumber: 1,
+      timeSlotType: 'AM',
       booking: {
         surgeon: 'Dr. Michael Brown',
         nurses: ['Nurse Alice', 'Nurse David', 'Nurse Emma', 'Nurse Frank'],
@@ -31,19 +48,33 @@ export const createDemoSchedule = (year: number, month: number, selectedDay: Day
       }
     },
     {
-      timeSlotId: 'week-3-room-2-pm',
+      date: '2024-01-02', // Tuesday
+      dayOfWeek: 'Tuesday',
+      weekNumber: 1,
+      roomNumber: 1,
+      timeSlotType: 'AM',
       booking: {
         surgeon: 'Dr. Jennifer Lee',
         nurses: ['Nurse Grace', 'Nurse Henry'],
         anaesthetist: 'Dr. Kevin Martinez'
       }
+    },
+    {
+      date: '2024-01-02', // Tuesday
+      dayOfWeek: 'Tuesday',
+      weekNumber: 1,
+      roomNumber: 2,
+      timeSlotType: 'PM',
+      booking: {
+        surgeon: 'Dr. David Wilson',
+        nurses: ['Nurse Sarah', 'Nurse James'],
+        anaesthetist: 'Dr. Lisa Anderson'
+      }
     }
   ];
   
   // Apply demo bookings
-  demoBookings.forEach(({ timeSlotId, booking }) => {
-    schedule = updateTimeSlotBooking(schedule, timeSlotId, booking);
+  demoBookings.forEach(({ date, dayOfWeek, weekNumber, roomNumber, timeSlotType, booking }) => {
+    saveBooking(date, dayOfWeek, weekNumber, roomNumber, timeSlotType, booking);
   });
-  
-  return schedule;
 }; 
