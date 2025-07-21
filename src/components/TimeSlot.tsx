@@ -51,11 +51,9 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({ timeSlot, onBook, onEdit }) 
           <div className="text-xs text-gray-600">
             <span className="font-medium">Nurses:</span> {timeSlot.booking?.nurses.join(', ')}
           </div>
-          {timeSlot.booking?.anaesthetist && (
-            <div className="text-xs text-gray-600">
-              <span className="font-medium">Anaesthetist:</span> {timeSlot.booking.anaesthetist}
-            </div>
-          )}
+          <div className="text-xs text-gray-600">
+            <span className="font-medium">Anaesthetist:</span> {timeSlot.booking?.anaesthetist || 'None'}
+          </div>
         </div>
       </div>
     );
